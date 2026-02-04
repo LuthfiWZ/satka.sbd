@@ -1,53 +1,50 @@
 <?php
-// Koneksi ke database
 include '../db.php';
-
-// Response JSON
 header('Content-Type: application/json');
 
-// Ambil data dari POST
-$id         = $_POST['id'];          // ID user
-$nama_kategori   = $_POST['nama_kategori$nama_kategori'];    // nama_kategori$nama_kategori
-$deskripsi      = $_POST['deskripsi'];       // deskripsi
+// Ambil POST
+$id            = $_POST['id'] ?? null;
+$nama_kategori = $_POST['nama_kategori'] ?? null;
+$deskripsi     = $_POST['deskripsi'] ?? null;
 
+// Validasi wajib
+if (!$id || !$nama_kategori) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "ID dan Nama Kategori wajib diisi"
+    ]);
+    exit;
+}
 
-// Prepared statement 
+// Prepare query
 $stmt = $conn->prepare("
     UPDATE kategori
-    SET nama_kategori$nama_kategori = ?, deskripsi = ? 
+    SET nama_kategori = ?,
+        deskripsi = ?
     WHERE id = ?
 ");
 
-// s = string, i = integer
+// Bind parameter (2 string, 1 integer)
 $stmt->bind_param(
-    "sssii",
+    "ssi",
     $nama_kategori,
-    $deskripsi
+    $deskripsi,
+    $id
 );
 
 // Eksekusi
 if ($stmt->execute()) {
-
     echo json_encode([
-        "status"  => "success",
-        "message" => "Data user berhasil diperbarui",
-        "data"    => [
-            "id"         => $id,
-            "nama_kategori$nama_kategori"   => $nama_kategori,
-            "deskripsi"      => $deskripsi
-        ]
+        "status" => "success",
+        "message" => "Kategori berhasil diperbarui"
     ]);
-
 } else {
-
     echo json_encode([
-        "status"  => "error",
+        "status" => "error",
         "message" => $stmt->error
     ]);
-
 }
 
-// Tutup koneksi
 $stmt->close();
 $conn->close();
 ?>
