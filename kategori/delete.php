@@ -2,12 +2,12 @@
 include '../db.php';
 header('Content-Type: application/json');
 
-// Ambil data dari POST atau JSON
+// Ambil JSON body
 $data = json_decode(file_get_contents("php://input"), true);
-$id = $_POST['id'] ?? $data['id'] ?? null;
+$id = $data['id'] ?? null;
 
 // Validasi
-if (!$id) {
+if ($id === null) {
     http_response_code(400);
     echo json_encode([
         "status" => "error",
@@ -16,14 +16,14 @@ if (!$id) {
     exit;
 }
 
-// Hapus data
+// Delete
 $stmt = $conn->prepare("DELETE FROM kategori WHERE id = ?");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
     echo json_encode([
         "status" => "success",
-        "message" => "Data user berhasil dihapus"
+        "message" => "Kategori berhasil dihapus"
     ]);
 } else {
     echo json_encode([
@@ -34,4 +34,3 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $conn->close();
-?>

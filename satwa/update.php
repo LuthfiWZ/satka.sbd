@@ -2,9 +2,8 @@
 include '../db.php';
 header('Content-Type: application/json');
 
-// Ambil data POST (aman dari warning)
+// Ambil data POST
 $id                = $_POST['id'] ?? null;
-
 $nama_latin        = $_POST['nama_latin'] ?? null;
 $nama_umum         = $_POST['nama_umum'] ?? null;
 $deskripsi         = $_POST['deskripsi'] ?? null;
@@ -15,7 +14,7 @@ $ancaman           = $_POST['ancaman'] ?? null;
 $upaya_konservasi  = $_POST['upaya_konservasi'] ?? null;
 $gambar_url        = $_POST['gambar_url'] ?? null;
 
-// Validasi minimal
+// Validasi ID wajib ada
 if (!$id) {
     echo json_encode([
         "status" => "error",
@@ -24,7 +23,7 @@ if (!$id) {
     exit;
 }
 
-// Prepared statement
+// Prepare statement
 $stmt = $conn->prepare("
     UPDATE satwa
     SET nama_latin = ?,
@@ -40,7 +39,7 @@ $stmt = $conn->prepare("
     WHERE id = ?
 ");
 
-// Semua string + 1 integer
+// Bind parameter (9 string + 1 integer)
 $stmt->bind_param(
     "sssssssssi",
     $nama_latin,

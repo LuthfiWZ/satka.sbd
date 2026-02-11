@@ -3,11 +3,14 @@ include '../db.php';
 header('Content-Type: application/json');
 
 // Ambil POST dengan aman
-$id         = $_POST['id'] ?? null;
-$nama_game  = $_POST['nama_game'] ?? null;
-$deskripsi  = $_POST['deskripsi'] ?? null;
-$tipe_game  = $_POST['tipe_game'] ?? null;
-$url_game   = $_POST['url_game'] ?? null;
+$data = json_decode(file_get_contents("php://input"), true);
+
+$id         = $_POST['id']         ?? $data['id']         ?? null;
+$nama_game  = $_POST['nama_game']  ?? $data['nama_game']  ?? null;
+$deskripsi  = $_POST['deskripsi']  ?? $data['deskripsi']  ?? null;
+$tipe_game  = $_POST['tipe_game']  ?? $data['tipe_game']  ?? null;
+$url_game   = $_POST['url_game']   ?? $data['url_game']   ?? null;
+
 
 // Validasi WAJIB
 if (!$id || !$nama_game || !$tipe_game) {

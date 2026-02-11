@@ -2,12 +2,12 @@
 include '../db.php';
 header('Content-Type: application/json');
 
-// Ambil data dari POST atau JSON
+// Ambil data POST & JSON
 $data = json_decode(file_get_contents("php://input"), true);
 $id = $_POST['id'] ?? $data['id'] ?? null;
 
-// Validasi
-if (!$id) {
+// Validasi id
+if ($id === null || $id === '') {
     http_response_code(400);
     echo json_encode([
         "status" => "error",
@@ -16,14 +16,14 @@ if (!$id) {
     exit;
 }
 
-// Hapus data
+// Delete
 $stmt = $conn->prepare("DELETE FROM game WHERE id = ?");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
     echo json_encode([
         "status" => "success",
-        "message" => "Data user berhasil dihapus"
+        "message" => "Data game berhasil dihapus"
     ]);
 } else {
     echo json_encode([
@@ -34,4 +34,3 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $conn->close();
-?>

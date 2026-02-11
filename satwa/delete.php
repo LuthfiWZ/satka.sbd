@@ -2,36 +2,39 @@
 include '../db.php';
 header('Content-Type: application/json');
 
-// Ambil data dari POST atau JSON
 $data = json_decode(file_get_contents("php://input"), true);
-$id = $_POST['id'] ?? $data['id'] ?? null;
 
-// Validasi
-if (!$id) {
+// Ambil id dari JSON / POST / GET
+$id = $data['id'] ?? $_POST['id'] ?? $_GET['id'] ?? null;
+
+// Validasi YANG BENAR
+if ($id === null) {
     http_response_code(400);
     echo json_encode([
-        "status" => "error",
+        "status"  => "error",
         "message" => "Parameter id tidak ditemukan"
     ]);
     exit;
 }
 
-// Hapus data
+$id = (int) $id;
+
+// Delete
 $stmt = $conn->prepare("DELETE FROM satwa WHERE id = ?");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
     echo json_encode([
-        "status" => "success",
-        "message" => "Data user berhasil dihapus"
+        "status"  => "success",
+        "message" => "Data satwa berhasil dihapus"
     ]);
 } else {
+    http_response_code(400);
     echo json_encode([
-        "status" => "error",
+        "status"  => "error",
         "message" => $stmt->error
     ]);
 }
 
 $stmt->close();
 $conn->close();
-?>

@@ -2,13 +2,16 @@
 include '../db.php';
 header('Content-Type: application/json');
 
-// Ambil POST
-$id            = $_POST['id'] ?? null;
-$nama_kategori = $_POST['nama_kategori'] ?? null;
-$deskripsi     = $_POST['deskripsi'] ?? null;
+// Ambil data POST atau JSON
+$data = json_decode(file_get_contents("php://input"), true);
 
-// Validasi wajib
-if (!$id || !$nama_kategori) {
+$id            = $_POST['id']            ?? $data['id']            ?? null;
+$nama_kategori = $_POST['nama_kategori'] ?? $data['nama_kategori'] ?? null;
+$deskripsi     = $_POST['deskripsi']     ?? $data['deskripsi']     ?? null;
+
+// VALIDASI
+if ($id === null || empty($nama_kategori)) {
+    http_response_code(400);
     echo json_encode([
         "status" => "error",
         "message" => "ID dan Nama Kategori wajib diisi"
@@ -24,21 +27,19 @@ $stmt = $conn->prepare("
     WHERE id = ?
 ");
 
-// Bind parameter (2 string, 1 integer)
-$stmt->bind_param(
-    "ssi",
-    $nama_kategori,
-    $deskripsi,
-    $id
-);
+// Bind parameter
+$stmt->bind_param("ssi", $nama_kategori, $deskripsi, $id);
 
-// Eksekusi
+// Execute
 if ($stmt->execute()) {
+
     echo json_encode([
         "status" => "success",
         "message" => "Kategori berhasil diperbarui"
     ]);
+
 } else {
+
     echo json_encode([
         "status" => "error",
         "message" => $stmt->error
@@ -47,4 +48,3 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $conn->close();
-?>

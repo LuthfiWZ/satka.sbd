@@ -2,12 +2,12 @@
 include '../db.php';
 header('Content-Type: application/json');
 
-// Ambil data dari POST atau JSON
+// Ambil data JSON
 $data = json_decode(file_get_contents("php://input"), true);
-$id = $_POST['id'] ?? $data['id'] ?? null;
+$id = $data['id'] ?? null;
 
 // Validasi
-if (!$id) {
+if ($id === null) {
     http_response_code(400);
     echo json_encode([
         "status" => "error",
@@ -23,7 +23,7 @@ $stmt->bind_param("i", $id);
 if ($stmt->execute()) {
     echo json_encode([
         "status" => "success",
-        "message" => "Data user berhasil dihapus"
+        "message" => "Data quiz berhasil dihapus"
     ]);
 } else {
     echo json_encode([
@@ -34,4 +34,3 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $conn->close();
-?>
